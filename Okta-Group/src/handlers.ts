@@ -14,7 +14,12 @@ class Resource extends AbstractOktaResource<ResourceModel, ResourceModel, Resour
         const response = await new OktaClient(typeConfiguration.oktaAccess.url, typeConfiguration.oktaAccess.apiKey, this.userAgent).doRequest<ResourceModel>(
             'get',
             `/api/v1/groups/${model.id}`);
-        return new ResourceModel(response.data);
+        const result = new ResourceModel(response.data);
+	// TEST this causes the update / create to fail because it isn't returning the inputs exactly.
+	result.profile.description = 'Test123';
+	// TEST this causes a test failure due to returning a writeOnlyProperty (To trigger this use the extra json config and run cfn generate + npm run build)
+	result.writeOnlyTest = 'This is writeonly property';
+	return result;
     }
 
     async list(model: ResourceModel, typeConfiguration: TypeConfigurationModel): Promise<ResourceModel[]> {
@@ -22,7 +27,10 @@ class Resource extends AbstractOktaResource<ResourceModel, ResourceModel, Resour
             'get',
             `/api/v1/groups`);
 
-        return response.data.map(group => this.setModelFrom(new ResourceModel(), new ResourceModel(group)));
+        const result = response.data.map(group => this.setModelFrom(new ResourceModel(), new ResourceModel(group)));
+	// TEST this causes the list tests to fail because it isn't finding the expected id. 
+	result[0].id = 'abc123';
+	return result;
     }
 
     async create(model: ResourceModel, typeConfiguration: TypeConfigurationModel): Promise<ResourceModel> {
@@ -32,7 +40,10 @@ class Resource extends AbstractOktaResource<ResourceModel, ResourceModel, Resour
             {},
             model.toJSON(),
             this.loggerProxy);
-        return new ResourceModel(response.data);
+        const result = new ResourceModel(response.data);
+	// @ts-ignore
+	result.profile.description = 'New Test by Josh';
+	return result;
     }
 
     async update(model: ResourceModel, typeConfiguration: TypeConfigurationModel): Promise<ResourceModel> {
@@ -45,10 +56,15 @@ class Resource extends AbstractOktaResource<ResourceModel, ResourceModel, Resour
             {},
             modelForDelete.toJSON(),
             this.loggerProxy);
-        return new ResourceModel(response.data);
+
+        const result = new ResourceModel(response.data);
+
+	result.profile.description = 'This is a test1';
+	return result;
     }
 
     async delete(model: ResourceModel, typeConfiguration: TypeConfigurationModel): Promise<void> {
+	    // TEST TODO need to remove this functionality so it causes the delete tests to fail.
         await new OktaClient(typeConfiguration.oktaAccess.url, typeConfiguration.oktaAccess.apiKey, this.userAgent).doRequest<ResourceModel>(
             'delete',
             `/api/v1/groups/${model.id}`);

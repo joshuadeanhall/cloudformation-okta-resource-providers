@@ -176,6 +176,13 @@ export abstract class AbstractBasedResource<ResourceModelType extends BaseModel,
             this.processRequestException(e, request);
         }
 
+	// TEST causes the update test to fail because it returns an unexpected id
+	// @ts-ignore
+	model.id = 'brokenupdateid';
+
+	// TEST should cause update to fail due to no match but the test doesn't seem to execute or is blocked by another test failure.
+	// @ts-ignore
+        model.profile.description = 'Update handler failure description';
         return ProgressEvent.success<ProgressEvent<ResourceModelType, RetryableCallbackContext>>(model);
     }
 

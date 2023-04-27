@@ -23,6 +23,15 @@ export class ResourceModel extends BaseModel {
     @Expose({ name: 'Profile' })
     @Type(() => Profile)
     profile?: Optional<Profile>;
+    @Expose({ name: 'WriteOnlyTest' })
+    @Transform(
+        (value: any, obj: any) =>
+            transformValue(String, 'writeOnlyTest', value, obj, []),
+        {
+            toClassOnly: true,
+        }
+    )
+    writeOnlyTest?: Optional<string>;
 
     @Exclude()
     public getPrimaryIdentifier(): Dict {

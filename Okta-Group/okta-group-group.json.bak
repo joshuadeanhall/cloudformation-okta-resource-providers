@@ -67,6 +67,9 @@
     "primaryIdentifier": [
         "/properties/Id"
     ],
+    "writeOnlyProperties": [
+	"/properties/WriteOnlyTest"
+    ],
     "handlers": {
         "create": {
             "permissions": []
